@@ -194,6 +194,75 @@ CREATE TABLE IF NOT EXISTS vacancies (
   vacant      INTEGER NOT NULL DEFAULT 0,
   priority    INTEGER
 );
+ALTER TABLE vacancies ADD COLUMN IF NOT EXISTS remarks TEXT;
+
+-- Post-wise establishment of non-teaching posts (BPS 1-22): approved in budget book 2006-10, after 2010, abolished
+CREATE TABLE IF NOT EXISTS establishment_posts (
+  id                  SERIAL PRIMARY KEY,
+  post                TEXT NOT NULL,
+  bps                 INTEGER,
+  approved_2006_10    INTEGER NOT NULL DEFAULT 0,
+  approved_after_2010 INTEGER NOT NULL DEFAULT 0,
+  abolished           INTEGER NOT NULL DEFAULT 0,
+  total               INTEGER NOT NULL DEFAULT 0,
+  working             INTEGER,
+  remarks             TEXT
+);
+
+-- Recruitment Rules 2026 (BPS-17 & above), approved by the Syndicate on 21-01-2026
+CREATE TABLE IF NOT EXISTS recruitment_rules (
+  id               SERIAL PRIMARY KEY,
+  sr_no            INTEGER NOT NULL,
+  sr_label         TEXT NOT NULL,
+  post             TEXT NOT NULL,
+  post_title       TEXT,
+  num_posts        TEXT,
+  cadre            TEXT,
+  classification   TEXT,
+  scale            TEXT,
+  recruitment_mode TEXT,
+  age_limit        TEXT,
+  qualification    TEXT,
+  probation        TEXT,
+  experience       TEXT,
+  job_description  TEXT,
+  departments      JSONB NOT NULL DEFAULT '[]'
+);
+
+-- General provisions of the recruitment rules, paragraph by paragraph
+CREATE TABLE IF NOT EXISTS recruitment_rules_text (
+  id      SERIAL PRIMARY KEY,
+  sort    INTEGER NOT NULL,
+  text    TEXT NOT NULL,
+  heading BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+-- Office of the Deputy Registrar (General): sections, job descriptions and staff assignments
+CREATE TABLE IF NOT EXISTS office_sections (
+  id          SERIAL PRIMARY KEY,
+  sort        INTEGER NOT NULL,
+  name        TEXT NOT NULL,
+  description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS job_descriptions (
+  id       SERIAL PRIMARY KEY,
+  sort     INTEGER NOT NULL,
+  position TEXT NOT NULL,
+  summary  TEXT,
+  duties   TEXT[] NOT NULL DEFAULT '{}'
+);
+
+CREATE TABLE IF NOT EXISTS office_staff (
+  id                 SERIAL PRIMARY KEY,
+  sort               INTEGER NOT NULL,
+  name               TEXT NOT NULL,
+  designation        TEXT,
+  section            TEXT,
+  duties             TEXT,
+  job_description_id INTEGER REFERENCES job_descriptions(id) ON DELETE SET NULL,
+  employee_id        INTEGER REFERENCES employees(id) ON DELETE SET NULL
+);
 
 CREATE TABLE IF NOT EXISTS audit_log (
   id          BIGSERIAL PRIMARY KEY,

@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, CalendarClock, FileStack, LayoutDashboard, ScrollText, ShieldCheck, Users, UserPlus, Briefcase } from "lucide-react";
+import { Building2, CalendarClock, FileStack, LayoutDashboard, ScrollText, ShieldCheck, Users, UserPlus, Briefcase, Landmark, BookOpenCheck, Network } from "lucide-react";
 
 const LINKS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/employees", label: "Employees", icon: Users },
   { href: "/employees/new", label: "Add Employee", icon: UserPlus, edit: true },
   { href: "/units", label: "Departments & Offices", icon: Building2 },
+  { href: "/establishment", label: "Establishment", icon: Landmark },
   { href: "/vacancies", label: "Vacant Positions", icon: Briefcase },
+  { href: "/recruitment-rules", label: "Recruitment Rules", icon: BookOpenCheck },
+  { href: "/drg-office", label: "DRG Office", icon: Network },
   { href: "/retirements", label: "Retirements", icon: CalendarClock },
   { href: "/documents", label: "Documents", icon: FileStack },
   { href: "/users", label: "Users", icon: ShieldCheck },

@@ -43,7 +43,7 @@ export default async function EmployeeProfile({ params, searchParams }: { params
   if (!emp) notFound();
   delete emp.photo;
 
-  const [counts, rows] = await Promise.all([
+  const [counts, rows, assignment, rule] = await Promise.all([
     queryOne<Record<string, number>>(
       `SELECT (SELECT count(*)::int FROM service_records WHERE employee_id = $1) service,
               (SELECT count(*)::int FROM employee_charges WHERE employee_id = $1) charges,
@@ -53,6 +53,13 @@ export default async function EmployeeProfile({ params, searchParams }: { params
               (SELECT count(*)::int FROM leaves WHERE employee_id = $1) leaves,
               (SELECT count(*)::int FROM documents WHERE employee_id = $1) documents`, [id]),
     loadTab(tab, id),
+    queryOne<{ section: string | null; duties: string | null; designation: string | null }>(
+      "SELECT section, duties, designation FROM office_staff WHERE employee_id = $1 LIMIT 1", [id]),
+    emp.staff_type === "Non-Teaching" && Number(emp.bps) >= 17 && emp.designation
+      ? queryOne<{ id: number; post_title: string }>(
+        `SELECT id, post_title FROM recruitment_rules
+         WHERE lower(post) = lower($1) OR lower(post) = lower(regexp_replace($1, '\\s*/.*$', '')) ORDER BY sr_no LIMIT 1`, [emp.designation])
+      : Promise.resolve(null),
   ]);
 
   const s = (k: string) => (emp[k] as string | null) ?? null;
@@ -149,8 +156,18 @@ export default async function EmployeeProfile({ params, searchParams }: { params
                 <Field label="Date of retirement" value={fmtDate(s("date_of_retirement"))} />
                 <Field label="Personal file no." value={s("personnel_file_no")} />
                 {s("director_id") && <Field label="Director ID" value={s("director_id")} />}
-                {s("posting_label") && <Field label="Posting (budget book)" value={s("posting_label")} />}
+                {s("posting_label") && <Field label="Posting / office (as listed)" value={s("posting_label")} />}
+                {rule && <Field label="Recruitment rule" value={<Link href={`/recruitment-rules/${rule.id}`} className="text-uok-700 hover:underline">{rule.post_title}</Link>} />}
               </dl>
+              {assignment && (
+                <div className="mt-5 rounded-lg border border-line bg-canvas p-3 text-sm">
+                  <div className="text-xs font-medium tracking-wide text-muted uppercase">Assignment in the DRG office</div>
+                  <div className="mt-1 font-medium text-navy">
+                    <Link href="/drg-office" className="hover:text-uok-700">{assignment.section?.startsWith("Office of") ? assignment.designation : assignment.section ?? assignment.designation}</Link>
+                  </div>
+                  {assignment.duties && <p className="mt-1 text-xs text-muted">{assignment.duties}</p>}
+                </div>
+              )}
             </section>
             <section className="card p-5">
               <h2 className="mb-4 font-semibold text-navy">Contact</h2>

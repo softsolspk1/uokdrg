@@ -44,4 +44,8 @@ next-env.d.ts
 /*.xlsx
 /*.xlsm
 /*.pdf
+/new/
 /data/seed.json
+
+# python
+__pycache__/

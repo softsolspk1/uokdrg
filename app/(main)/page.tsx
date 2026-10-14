@@ -61,7 +61,7 @@ export default async function Dashboard() {
         <Stat label="Non-teaching staff" value={nf.format(t.nonteaching)} hint="Officers & staff" href="/employees?type=Non-Teaching" accent="navy" />
         <Stat label="On leave / away" value={nf.format(t.away)} hint="Study leave, FSL, lien, UA…" href="/employees?status=away" accent="gold" />
         <Stat label="Retiring in 12 months" value={nf.format(t.retiring12)} hint="Superannuation at 60" href="/retirements" accent="crimson" />
-        <Stat label="Vacant positions" value={nf.format(vac?.vacant ?? 0)} hint={`of ${nf.format(vac?.sanctioned ?? 0)} listed posts`} href="/vacancies" accent="navy" />
+        <Stat label="Vacant positions" value={nf.format(vac?.vacant ?? 0)} hint={`of ${nf.format(vac?.sanctioned ?? 0)} teaching & non-teaching posts`} href="/vacancies" accent="navy" />
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">

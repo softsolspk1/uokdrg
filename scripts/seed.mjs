@@ -21,7 +21,8 @@ const reset = process.argv.includes("--reset");
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
 await client.connect();
 
-const tables = ["audit_log", "vacancies", "documents", "leaves", "service_records", "family_members",
+const tables = ["audit_log", "office_staff", "job_descriptions", "office_sections", "recruitment_rules_text",
+  "recruitment_rules", "establishment_posts", "vacancies", "documents", "leaves", "service_records", "family_members",
   "experiences", "qualifications", "employee_charges", "employees", "budget_posts", "units"];
 
 try {
@@ -66,13 +67,13 @@ try {
 
   await client.query(
     `INSERT INTO employees (employee_no, full_name, gender, staff_type, designation, bps, unit_id, status,
-       status_remarks, date_of_birth, dob_derived, date_of_retirement, director_id, posting_label, source)
+       status_remarks, date_of_birth, dob_derived, date_of_retirement, director_id, posting_label, remarks, source)
      SELECT x.employee_no, x.full_name, x.gender, x.staff_type, x.designation, x.bps, u.id, x.status,
        x.status_remarks, x.date_of_birth, coalesce(x.dob_derived, false), x.date_of_retirement,
-       x.director_id, x.posting_label, x.source
+       x.director_id, x.posting_label, x.remarks, x.source
      FROM json_to_recordset($1) AS x(employee_no text, full_name text, gender text, staff_type text,
        designation text, bps int, unit_code text, status text, status_remarks text, date_of_birth date,
-       dob_derived boolean, date_of_retirement date, director_id text, posting_label text, source text)
+       dob_derived boolean, date_of_retirement date, director_id text, posting_label text, remarks text, source text)
      LEFT JOIN units u ON u.code = x.unit_code
      ORDER BY x.employee_no`,
     [JSON.stringify(seed.employees)]);
@@ -94,17 +95,61 @@ try {
      FROM employees e LEFT JOIN units u ON u.id = e.unit_id`);
 
   await client.query(
-    `INSERT INTO vacancies (grp, post, department, bps, sanctioned, working, vacant, priority)
-     SELECT "group", post, department, bps, sanctioned, working, vacant, priority
+    `INSERT INTO vacancies (grp, post, department, bps, sanctioned, working, vacant, priority, remarks)
+     SELECT "group", post, department, bps, sanctioned, working, vacant, priority, remarks
      FROM json_to_recordset($1) AS x("group" text, post text, department text, bps text,
-       sanctioned int, working int, vacant int, priority int)`,
-    [JSON.stringify(seed.vacancies)]);
+       sanctioned int, working int, vacant int, priority int, remarks text, ord int)
+     ORDER BY ord`,
+    [JSON.stringify(seed.vacancies.map((v, ord) => ({ ...v, ord })))]);
+
+  await client.query(
+    `INSERT INTO establishment_posts (post, bps, approved_2006_10, approved_after_2010, abolished, total, working, remarks)
+     SELECT post, bps, approved_2006_10, approved_after_2010, abolished, total, working, remarks
+     FROM json_to_recordset($1) AS x(post text, bps int, approved_2006_10 int, approved_after_2010 int,
+       abolished int, total int, working int, remarks text)`,
+    [JSON.stringify(seed.establishment)]);
+
+  const rr = seed.recruitment_rules;
+  await client.query(
+    `INSERT INTO recruitment_rules (sr_no, sr_label, post, post_title, num_posts, cadre, classification, scale,
+       recruitment_mode, age_limit, qualification, probation, experience, job_description, departments)
+     SELECT sr_no, sr_label, post, post_title, num_posts, cadre, classification, scale, recruitment_mode, age_limit,
+       qualification, probation, experience, job_description, coalesce(departments, '[]')
+     FROM json_to_recordset($1) AS x(sr_no int, sr_label text, post text, post_title text, num_posts text, cadre text,
+       classification text, scale text, recruitment_mode text, age_limit text, qualification text, probation text,
+       experience text, job_description text, departments jsonb)`,
+    [JSON.stringify(rr.rules)]);
+  await client.query(
+    `INSERT INTO recruitment_rules_text (sort, text, heading)
+     SELECT ord, text, heading FROM json_to_recordset($1) AS x(ord int, text text, heading boolean)`,
+    [JSON.stringify(rr.general.map((g, ord) => ({ ...g, ord })))]);
+
+  const drg = seed.drg_office;
+  await client.query(
+    `INSERT INTO office_sections (sort, name, description)
+     SELECT sort, name, description FROM json_to_recordset($1) AS x(sort int, name text, description text)`,
+    [JSON.stringify(drg.sections)]);
+  const { rows: jdRows } = await client.query(
+    `INSERT INTO job_descriptions (sort, position, summary, duties)
+     SELECT ord, position, summary, ARRAY(SELECT json_array_elements_text(duties))
+     FROM json_to_recordset($1) AS x(ord int, position text, summary text, duties json)
+     ORDER BY ord
+     RETURNING id, sort`,
+    [JSON.stringify(drg.job_descriptions.map((j, ord) => ({ ...j, ord })))]);
+  const jdId = Object.fromEntries(jdRows.map((r) => [r.sort, r.id]));
+  await client.query(
+    `INSERT INTO office_staff (sort, name, designation, section, duties, job_description_id, employee_id)
+     SELECT x.ord, x.name, x.designation, x.section, x.duties, x.jd_id, e.id
+     FROM json_to_recordset($1) AS x(ord int, name text, designation text, section text, duties text, jd_id int, employee_no text)
+     LEFT JOIN employees e ON e.employee_no = x.employee_no`,
+    [JSON.stringify(drg.staff.map((s, ord) => ({ ...s, ord, jd_id: jdId[s.jd] ?? null })))]);
 
   await client.query("COMMIT");
   const counts = await client.query(
     `SELECT (SELECT count(*) FROM units) units, (SELECT count(*) FROM budget_posts) posts,
             (SELECT count(*) FROM employees) employees, (SELECT count(*) FROM employee_charges) charges,
-            (SELECT count(*) FROM vacancies) vacancies`);
+            (SELECT count(*) FROM vacancies) vacancies, (SELECT count(*) FROM establishment_posts) establishment,
+            (SELECT count(*) FROM recruitment_rules) recruitment_rules, (SELECT count(*) FROM office_staff) drg_staff`);
   console.log("Loaded:", counts.rows[0]);
 } catch (err) {
   await client.query("ROLLBACK").catch(() => {});
