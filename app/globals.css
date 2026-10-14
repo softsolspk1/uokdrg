@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* University of Karachi palette (from uok.edu.pk): maroon crest, crimson accent, navy titles, gold trim */
+@theme {
+  --color-uok-50: #fdf3f3;
+  --color-uok-100: #fbe4e4;
+  --color-uok-200: #f5c6c7;
+  --color-uok-300: #e99a9b;
+  --color-uok-500: #b3242a;
+  --color-uok-600: #9a0f13;
+  --color-uok-700: #7c0405;
+  --color-uok-800: #620304;
+  --color-uok-900: #4a0203;
+  --color-crimson: #d3224d;
+  --color-navy: #081933;
+  --color-navy-700: #13284a;
+  --color-gold: #d4af37;
+  --color-gold-100: #f8efd2;
+  --color-ink: #1f2937;
+  --color-muted: #5b6676;
+  --color-line: #e3e6eb;
+  --color-canvas: #f5f6f8;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif-display), Georgia, serif;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+@utility card {
+  @apply rounded-xl border border-line bg-white shadow-[0_1px_2px_rgba(8,25,51,0.04)];
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+@utility btn-primary {
+  @apply btn bg-uok-700 text-white hover:bg-uok-800;
+}
+
+@utility btn-secondary {
+  @apply btn border border-line bg-white text-ink hover:bg-canvas;
+}
+
+@utility btn-danger {
+  @apply btn border border-red-200 bg-white text-red-700 hover:bg-red-50;
+}
+
+@utility btn-sm {
+  @apply px-2.5! py-1! text-xs!;
+}
+
+@utility input {
+  @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none placeholder:text-slate-400 focus:border-uok-500 focus:ring-2 focus:ring-uok-100;
+}
+
+@utility label {
+  @apply mb-1 block text-xs font-medium tracking-wide text-muted uppercase;
+}
+
+.table {
+  @apply w-full text-left text-sm;
+}
+
+.table th {
+  @apply border-b border-line bg-canvas px-3 py-2.5 text-xs font-semibold tracking-wide text-muted uppercase;
+}
+
+.table td {
+  @apply border-b border-line px-3 py-2.5 align-top;
+}
+
+.table tbody tr:hover {
+  @apply bg-uok-50/40;
+}
+
+@utility badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+}
+
+@utility page-title {
+  @apply font-serif text-2xl font-bold text-navy;
+}
