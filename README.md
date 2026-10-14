@@ -1,6 +1,6 @@
 # University of Karachi — HRM System
 
-Human Resource Management System for the Office of the Deputy Registrar (Establishment), University of Karachi.
+Human Resource Management System for the Office of the Deputy Registrar (General), University of Karachi.
 Next.js 16 (App Router) + PostgreSQL (Neon), styled with the UoK crest and colour scheme (maroon `#7c0405`, crimson `#d3224d`, navy `#081933`, gold `#d4af37`).
 
 ## Features

@@ -54,7 +54,7 @@ export default async function PrintProfile({ params }: { params: Promise<{ id: s
           <Image src="/uok-logo.png" alt="University of Karachi" width={58} height={70} />
           <div className="flex-1 text-center">
             <div className="font-serif text-xl font-bold text-uok-700">UNIVERSITY OF KARACHI</div>
-            <div className="text-xs">Office of the Deputy Registrar (Establishment)</div>
+            <div className="text-xs">Office of the Deputy Registrar (General)</div>
             <div className="mt-1 text-sm font-semibold tracking-wide">EMPLOYEE PROFILE SHEET</div>
           </div>
           {e.has_photo ? (
@@ -87,7 +87,7 @@ export default async function PrintProfile({ params }: { params: Promise<{ id: s
 
         <footer className="mt-12 flex justify-between text-xs">
           <div>Printed on {fmtDate(new Date().toISOString().slice(0, 10))}</div>
-          <div className="text-center"><div className="mb-1 w-48 border-t border-slate-500" />Deputy Registrar (Establishment)</div>
+          <div className="text-center"><div className="mb-1 w-48 border-t border-slate-500" />Deputy Registrar (General)</div>
         </footer>
       </article>
     </div>

@@ -21,7 +21,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         </Link>
         <NavLinks role={user.role} />
         <div className="border-t border-white/10 p-4 text-xs text-slate-400">
-          Office of the Deputy Registrar (Establishment)
+          Office of the Deputy Registrar (General)
         </div>
       </aside>
 
@@ -49,6 +49,11 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       </header>
 
       <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">{children}</main>
+
+      <footer className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-2 border-t border-line px-4 py-4 text-xs text-muted sm:px-6">
+        <span>© {new Date().getFullYear()} University of Karachi · Office of the Deputy Registrar (General)</span>
+        <span>Developed by <a href="https://softsols.pk/" target="_blank" rel="noopener noreferrer" className="font-medium text-uok-700 hover:underline">Softsols Pakistan</a></span>
+      </footer>
     </div>
   );
 }

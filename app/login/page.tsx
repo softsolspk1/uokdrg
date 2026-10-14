@@ -14,7 +14,7 @@ export default function LoginPage() {
           </div>
           <div>
             <div className="font-serif text-lg font-bold">University of Karachi</div>
-            <div className="text-xs tracking-widest text-uok-100 uppercase">Office of the Registrar · Establishment</div>
+            <div className="text-xs tracking-widest text-uok-100 uppercase">Office of the Deputy Registrar (General)</div>
           </div>
         </div>
         <div className="relative max-w-md">
@@ -36,6 +36,9 @@ export default function LoginPage() {
           <h2 className="font-serif text-2xl font-bold text-navy">Sign in</h2>
           <p className="mt-1 mb-6 text-sm text-muted">Use your HRM account to continue.</p>
           <LoginForm />
+          <p className="mt-10 text-center text-xs text-muted">
+            Developed by <a href="https://softsols.pk/" target="_blank" rel="noopener noreferrer" className="font-medium text-uok-700 hover:underline">Softsols Pakistan</a>
+          </p>
         </div>
       </div>
     </div>
